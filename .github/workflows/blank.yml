@@ -1,0 +1,124 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  NX_CLOUD_DISTRIBUTED_EXECUTION: true
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout [main]
+        with:
+          fetch-depth: 0
+      - name: Derive appropriate SHAs for base and head for `nx affected` commands
+        uses: nrwl/nx-set-shas@v2
+      - uses: actions/setup-node@v1 
+        with: 
+          node-version: '14'
+      - run: npm install
+      - run: npx nx-cloud start-ci-run    
+      - run: npx nx affected --target=build --parallel --max-parallel=3
+      - run: npx nx affected --target=test --parallel --max-parallel=2
+      - run: npx nx-cloud stop-all-agents
+  pr:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - name: Derive appropriate SHAs for base and head for `nx affected` commands
+        uses: nrwl/nx-set-shas@v2
+      - uses: actions/setup-node@v1
+        with: 
+          node-version: '14'
+      - run: npm install
+      - run: npx nx-cloud start-ci-run
+      - run: npx nx affected --target=build --parallel --max-parallel=3
+      - run: npx nx affected --target=test --parallel --max-parallel=2
+      - run: npx nx-cloud stop-all-agents
+  agents:
+    runs-on: ubuntu-latest
+    name: Agent 1
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        agent: [ 1, 2, 3 ]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with: 
+          node-version: '14'
+      - run: npm install
+      - name: Start Nx Agent ${{ matrix.agent }}
+        run: npx nx-cloud start-agent  
+
+The pr and main jobs implement the CI workflow. The 3 agent jobs execute the tasks created by pr and main. Setting timeout-minutes is needed only if you have very slow tasks.
+
+Note that if you use an older version of @nrwl/nx-cloud, you need to add the following two env variables.
+
+env:
+  NX_BRANCH: ${{ github.event.number || github.ref }}
+  NX_RUN_GROUP: ${{ github.run_id }}
+
+You can find more information about using GitHub Actions on the nx-tag-successful-ci-run and nx-set-shas repos.
+
+Circle CI 
+An example of a Circle CI setup for an Nx workspace connected to Nx Cloud.
+
+version: 2.1
+orbs:  
+  nx: nrwl/nx@1.0.0
+jobs:
+  agent:
+    steps:
+      - checkout
+      - run: npm install
+      - run:
+          command: npx nx-cloud start-agent
+          no_output_timeout: 60m
+  main:
+    environment:
+      NX_CLOUD_DISTRIBUTED_EXECUTION: 'true'
+    steps:
+      - checkout
+      - run: npm install
+      - nx/set-shas
+      - run: npx nx affected --base=$NX_BASE --target=build --parallel --max-parallel=3
+      - run: npx nx affected --base=$NX_BASE --target=test --parallel --max-parallel=2
+      - run: npx nx-cloud stop-all-agents
+  pr:
+    environment:
+      NX_CLOUD_DISTRIBUTED_EXECUTION: 'true'
+    steps:
+      - checkout
+      - run: npm install
+      - nx/set-shas
+      - run: npx nx affected --base=$NX_BASE --target=build --parallel --max-parallel=3
+      - run: npx nx affected --base=$NX_BASE --target=test --parallel --max-parallel=2
+      - run: npx nx-cloud stop-all-agents
+workflows:
+  build:
+    jobs:
+      - agent:
+          name: 'agent1'
+      - agent:
+          name: 'agent2'
+      - agent:
+          name: 'agent3'
+      - main:
+          filters:
+            branches:
+              only: main
+      - pr:
+          filters:
+            branches:
+              ignore: main
