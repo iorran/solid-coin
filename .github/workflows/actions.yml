@@ -3,8 +3,10 @@ on:
   push:
     branches:
       - main
-  pull_request:
-
+      
+defaults:
+ run:
+   working-directory: ./solid-coin
 env:
   NX_CLOUD_DISTRIBUTED_EXECUTION: true 
   NX_BRANCH: ${{ github.event.number || github.ref }}
