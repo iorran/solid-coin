@@ -26,23 +26,17 @@ export function Index() {
           noValidate
           autoComplete="off"
           display="flex"
-          justifyContent="center"
-        >
-          <div>
+          justifyContent="start"
+        > 
             <TextField
               required
               id="money"
-              label="Money Invested" 
-            />
-            <TextField
-              required
-              id="days"
-              label="Time Investing (day)" 
-            />
-          </div>
+              label="Money Invested (day)" 
+            />  
         </Box>
 
         <Grid rows={data} />
+        
         <Typography variant="body2" gutterBottom textAlign="justify" m={2}>
           Investing in cryptocurrency involves a lot of thinking. The idea is that stressful decisions are taken out of the hands of the investor as investing in crypto involves a lot of thinking. 
         </Typography>
