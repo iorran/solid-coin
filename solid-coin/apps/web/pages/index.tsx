@@ -1,11 +1,16 @@
-import { Container, Box, Typography, CircularProgress, TextField } from '@mui/material';
+import { Container, Box, Typography, CircularProgress } from '@mui/material';
+
+import BitcoinSvg from '../public/bitcoin.svg';
 
 import { useCandlestick } from '../services/useCandlestick';
+import { InvestmentForm } from '../components/investment-form';
 import { Grid } from '../components/grid';
+import { useCoinValue } from '../services/useCoinValue';
 
 export function Index() {   
 
   const { data } = useCandlestick(); 
+  const { data: btcValue } = useCoinValue('BTCEUR'); 
 
   if(!data) {
     return (
@@ -18,22 +23,9 @@ export function Index() {
   return (
     <Container maxWidth="xl" >
       <Box sx={{ my: 4 }}>
-        <Box
-          component="form"
-          sx={{
-            '& .MuiTextField-root': { m: 1, width: '25ch' },
-          }}
-          noValidate
-          autoComplete="off"
-          display="flex"
-          justifyContent="start"
-        > 
-            <TextField
-              required
-              id="money"
-              label="Money Invested (day)" 
-            />  
-        </Box>
+        
+        <InvestmentForm />
+        {JSON.stringify(btcValue)} 
 
         <Grid rows={data} />
         
