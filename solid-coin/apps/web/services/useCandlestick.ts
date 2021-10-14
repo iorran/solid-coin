@@ -42,7 +42,7 @@ const transform = (data: CandlestickResponse, currentPrice: number): Candlestick
  
 const useCandlestick = (symbol: _symbol = 'BTCEUR', interval: interval = '1d', limit: number = 30) => {
   const { data: coinValue } = useCoinValue(symbol); 
-  return useQuery(['candlestick', {symbol, interval}], () => fetcher(symbol, interval, limit), { select: (data: CandlestickResponse) => transform(data, coinValue.price) });
+  return useQuery(['candlestick', {symbol, interval}], () => fetcher(symbol, interval, limit), { select: (data: CandlestickResponse) => transform(data, Number(coinValue?.price)) });
 }
 
 export { useCandlestick }
