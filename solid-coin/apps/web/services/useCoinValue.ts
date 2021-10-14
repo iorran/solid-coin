@@ -8,8 +8,9 @@ export type CoinValue = {
   price: string
 } 
 
-const fetcher = async (symbol: _symbol): Promise<CoinValue> => {
-  const { data } = await api.get<CoinValue>(`/api/v3/ticker/price?symbol=${symbol}`);    
+const fetcher = async (symbol: _symbol): Promise<CoinValue> => { 
+  //const { data } = await api.get<CoinValue>(`/api/v3/avgPrice?symbol=${symbol}`);    
+  const { data } = await api.get<CoinValue>(`/api/v3/avgPrice?symbol=${symbol}`);    
   return data; 
 }
 

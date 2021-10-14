@@ -1,16 +1,13 @@
 import { Container, Box, Typography, CircularProgress } from '@mui/material';
 
-import BitcoinSvg from '../public/bitcoin.svg';
-
 import { useCandlestick } from '../services/useCandlestick';
 import { InvestmentForm } from '../components/investment-form';
+import { CoinCurrentPrice } from '../components/coin-current-price';
 import { Grid } from '../components/grid';
-import { useCoinValue } from '../services/useCoinValue';
 
 export function Index() {   
 
   const { data } = useCandlestick(); 
-  const { data: btcValue } = useCoinValue('BTCEUR'); 
 
   if(!data) {
     return (
@@ -23,9 +20,10 @@ export function Index() {
   return (
     <Container maxWidth="xl" >
       <Box sx={{ my: 4 }}>
-        
-        <InvestmentForm />
-        {JSON.stringify(btcValue)} 
+        <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
+          <InvestmentForm />  
+          <CoinCurrentPrice />
+        </Box>
 
         <Grid rows={data} />
         

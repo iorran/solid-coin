@@ -4,24 +4,16 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 import { Candlestick } from '../services/useCandlestick'; 
  
-export enum CandlestickEnum { 
-  id = 'id',
-  openTime = 'Open time',
-  open = 'Open',
-  high = 'High',
-  low = 'Low',
-  close = 'Close',
-  volume = 'Volume',
-  closeTime = 'Close time',
-  quoteAssetVolume = 'Quote asset volume',
-  numberOfTrades = 'Number of trades',
-  takerBuyBaseAssetVolume = 'Taker buy base asset volume',
-  takerBuyQuoteAssetVolume = 'Taker buy quote asset volume'
+export enum ColumHeader {  
+  close = 'Day', 
+  closeTime = 'Value', 
+  profit = 'Profit'
 }  
 
 const columns: GridColDef[] = [
-  { field: 'closeTime', headerName: CandlestickEnum.closeTime, width: 150 },
-  { field: 'close', headerName: CandlestickEnum.close, width: 150 }
+  { field: 'closeTime', headerName: ColumHeader.closeTime, width: 150 },
+  { field: 'close', headerName: ColumHeader.close, width: 150 },
+  { field: 'profit', headerName: ColumHeader.profit, width: 150 }
 ]
 
 type GridProps = { rows: Candlestick[] }
