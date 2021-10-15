@@ -8,6 +8,7 @@ import { Grid } from '../components/grid';
 export function Index() {   
 
   const { data } = useCandlestick(); 
+  console.log("🚀 ~ file: index.tsx ~ line 11 ~ Index ~ data", data)
 
   if(!data) {
     return (

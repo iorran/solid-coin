@@ -8,16 +8,16 @@ export type CoinValue = {
   price: string
 } 
 
-const fetcher = async (symbol: _symbol): Promise<CoinValue> => { 
+const fetcher = async (symbol: _symbol): Promise<CoinValue> => {
   //const { data } = await api.get<CoinValue>(`/api/v3/avgPrice?symbol=${symbol}`);    
-  const { data } = await api.get<CoinValue>(`/api/v3/avgPrice?symbol=${symbol}`);    
+  const { data } = await api.get<CoinValue>(`/api/v3/ticker/price?symbol=${symbol}`);    
   return data; 
 }
 
 const select = (data: CoinValue) => data;
  
 const useCoinValue = (symbol: _symbol) => {
-  return useQuery(['coin', {symbol}], () => fetcher(symbol), { select });
+  return useQuery(['coin-price', {symbol}], () => fetcher(symbol), { select });
 }
 
 export { useCoinValue }
