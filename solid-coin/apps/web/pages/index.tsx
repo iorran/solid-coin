@@ -1,22 +1,10 @@
-import { Container, Box, Typography, CircularProgress } from '@mui/material';
-
-import { useCandlestick } from '../services/useCandlestick';
+import { Container, Box, Typography } from '@mui/material';
+ 
 import { InvestmentForm } from '../components/investment-form';
 import { CoinCurrentPrice } from '../components/coin-current-price';
 import { Grid } from '../components/grid';
 
 export function Index() {   
-
-  const { data } = useCandlestick(); 
-  console.log("🚀 ~ file: index.tsx ~ line 11 ~ Index ~ data", data)
-
-  if(!data) {
-    return (
-      <Container maxWidth="xl">
-        <Box sx={{ my: 4 }}><CircularProgress color="secondary" /></Box>
-      </Container>
-    );
-  } 
   
   return (
     <Container maxWidth="xl" >
@@ -26,7 +14,7 @@ export function Index() {
           <CoinCurrentPrice />
         </Box>
 
-        <Grid rows={data} />
+        <Grid />
         
         <Typography variant="body2" gutterBottom textAlign="justify" m={2}>
           Investing in cryptocurrency involves a lot of thinking. The idea is that stressful decisions are taken out of the hands of the investor as investing in crypto involves a lot of thinking. 

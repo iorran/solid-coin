@@ -11,6 +11,8 @@ export type Investment = {
     numberOfTrades: string,
     takerBuyBaseAssetVolume: string,
     takerBuyQuoteAssetVolume: string,
-    profit: number,
-    profitCurrency: number
+    avgPrice: string
+    dailyVariation: string,
+    profitDay: string,
+    compoundProfit: string
 }

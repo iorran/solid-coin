@@ -20,7 +20,7 @@ export const InvestmentForm = () => {
         <Box
           component="form"
           sx={{
-            '& .MuiTextField-root': { m: 1, width: '25ch' },
+            '& .MuiTextField-root': { m: 1 },
           }}
           noValidate
           autoComplete="off"
@@ -40,7 +40,7 @@ export const InvestmentForm = () => {
                 label="Investment"
                 InputLabelProps={{ shrink: true }}
             />   
-            <Button variant="contained" onClick={recalculate}>What I have lose?</Button>
+            <Button variant="contained" onClick={recalculate}>Check</Button>
         </Box>
     );
 }

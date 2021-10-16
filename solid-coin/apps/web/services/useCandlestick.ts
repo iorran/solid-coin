@@ -1,55 +1,61 @@
 import { useQuery } from 'react-query'; 
 import { useAtom } from 'jotai';
-import { differenceInDays, parseISO } from 'date-fns';
 
 import { api } from './api';
 import { useCoinValue } from './useCoinValue';
-import { profit, profitPercentual, profitCurrency } from '../utils/profit';
-import { Investment } from '../models/investment';
+import { variation, profit, daysGone, avg } from '../utils/investment-grid';
+import { formatCurrency, formatDate, formatPercentage } from '../utils/formatters';
+import { Investment } from '../types/investment';
  
 import { investmentFormAtom } from '../utils/atoms';
- 
-type _symbol = 'BTCEUR' | 'BTCBUSD';
-type interval = '1m' | '3m' | '5m' | '15m' | '30m' | '1h' | '2h' | '4h' | '6h' | '8h' | '12h' | '1d' | '3d' | '1w' | '1M';
+import { _symbol, _interval } from '../types/binance';
 
 type Candlestick = [string, string, string, string, string, string, string, string, string, string, string];
 type CandlestickResponse = Candlestick[];
 
-const fetcher = async (symbol: _symbol, interval: interval, limit: number): Promise<CandlestickResponse> => {
+const fetcher = async (symbol: _symbol, interval: _interval, limit: number): Promise<CandlestickResponse> => {
   const { data } = await api.get<CandlestickResponse>(`/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`);    
   return data; 
 }
 
 const transform = (candlestickData: CandlestickResponse, currentPrice: string, dailyInvestment: string): Investment[] => { 
-  return candlestickData.map((candlestick, index) => {
-    const [openTime, open, high, low, close, volume, closeTime, quoteAssetVolume, numberOfTrades, takerBuyBaseAssetVolume, takerBuyQuoteAssetVolume] = candlestick;
-  
-    const profitValue = profit(currentPrice, close);
-    
-    return {
-      id: index,
-      openTime,
-      open,
-      high,
-      low,
-      close,
-      volume,
-      closeTime,
-      quoteAssetVolume,
-      numberOfTrades,
-      takerBuyBaseAssetVolume,
-      takerBuyQuoteAssetVolume,
-      profit: profitPercentual(profitValue),
-      profitCurrency: profitCurrency(profitValue, dailyInvestment)
-    }
-  }); 
+  let compoundProfit = 0;
+  return candlestickData
+    .sort((a, b) => Number(a[0]) - Number(b[0]))
+    .map((candlestick, index) => {
+      const [openTime, open, high, low, close, volume, closeTime, quoteAssetVolume, numberOfTrades, takerBuyBaseAssetVolume, takerBuyQuoteAssetVolume] = candlestick;
+
+      const avgPrice = avg(high, low);
+      const dailyVariation = variation(currentPrice, open); 
+      const profitDay = profit(dailyVariation, dailyInvestment); 
+      compoundProfit += profitDay; 
+
+      return {
+        id: index,
+        openTime: formatDate(openTime),
+        open: formatCurrency(open),
+        high: formatCurrency(high),
+        low: formatCurrency(low),
+        close: formatCurrency(close),
+        volume: formatCurrency(volume),
+        closeTime: formatDate(closeTime),
+        quoteAssetVolume: formatCurrency(quoteAssetVolume),
+        numberOfTrades: formatCurrency(numberOfTrades),
+        takerBuyBaseAssetVolume: formatCurrency(takerBuyBaseAssetVolume),
+        takerBuyQuoteAssetVolume: formatCurrency(takerBuyQuoteAssetVolume),
+        avgPrice: formatCurrency(avgPrice),
+        dailyVariation: formatPercentage(dailyVariation),
+        profitDay: formatCurrency(profitDay),
+        compoundProfit: formatCurrency(compoundProfit)
+      }
+    }); 
 };
  
-export const useCandlestick = (symbol: _symbol = 'BTCEUR', interval: interval = '1d') => {
+export const useCandlestick = (symbol: _symbol = 'BTCEUR', interval: _interval = '1d') => {
   const { data: coinValue } = useCoinValue(symbol); 
   const [investment, ] = useAtom(investmentFormAtom); 
   
-  const limit = differenceInDays(new Date(), parseISO(investment.startDate));  
+  const limit = daysGone(investment.startDate);  
 
   return useQuery(['candlestick', {symbol, interval, limit}], () => fetcher(symbol, interval, limit), { select: (data: CandlestickResponse) => transform(data, coinValue.price, investment.money) });
 } 

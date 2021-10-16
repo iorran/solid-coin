@@ -1,27 +1,41 @@
 
 import React from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { Container, Box, CircularProgress } from '@mui/material';
 
-import { Investment } from '../models/investment';
+import { useCandlestick } from '../services/useCandlestick'; 
  
 export enum ColumHeader {  
-  close = 'Day', 
-  closeTime = 'Value', 
-  profit = 'Day Profit'
+  openTime = 'Day', 
+  open = 'Value', 
+  dailyVariation = 'Daily Variation',
+  profitDay = 'Day Profit',
+  compoundProfit = 'Compound Profit'
 }  
 
 const columns: GridColDef[] = [
-  { field: 'closeTime', headerName: ColumHeader.closeTime, width: 150 },
-  { field: 'close', headerName: ColumHeader.close, width: 150 },
-  { field: 'profit', headerName: ColumHeader.profit, width: 150 },
-  { field: 'profitCurrency', headerName: ColumHeader.profit, width: 150 },
+  { field: 'openTime', headerName: ColumHeader.openTime, width: 120 },
+  { field: 'open', headerName: ColumHeader.open, width: 100 },
+  { field: 'dailyVariation', headerName: ColumHeader.dailyVariation, width: 120 },
+  { field: 'profitDay', headerName: ColumHeader.profitDay, width: 100 },
+  { field: 'compoundProfit', headerName: ColumHeader.compoundProfit, width: 150 },
 ]
+ 
+export function Grid() {      
 
-type GridProps = { rows: Investment[] }
-export function Grid({ rows }: GridProps) {      
+  const { data } = useCandlestick();  
+
+  if(!data) {
+    return (
+      <Container maxWidth="xl">
+        <Box sx={{ my: 4 }}><CircularProgress color="secondary" /></Box>
+      </Container>
+    );
+  } 
+
   return (
     <div style={{ height: '75vh', width: '100%' }}>
-      <DataGrid pagination rows={rows} columns={columns} />
+      <DataGrid pagination rows={data} columns={columns} />
     </div>
   );
 } 
