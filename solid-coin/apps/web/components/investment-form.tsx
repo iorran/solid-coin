@@ -31,7 +31,7 @@ export const InvestmentForm = () => {
         >   
             <TextField 
                 {...register("startDate", { required: true })}  
-                label="Investment"
+                label="Since"
                 type="date"
                 InputLabelProps={{ shrink: true }}
             />    

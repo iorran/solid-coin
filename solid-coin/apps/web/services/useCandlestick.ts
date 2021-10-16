@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query'; 
-import { useAtom } from 'jotai';
+import { useAtom } from 'jotai';  
 
 import { api } from './api';
 import { useCoinValue } from './useCoinValue';
@@ -7,7 +7,7 @@ import { variation, profit, daysGone, avg } from '../utils/investment-grid';
 import { formatCurrency, formatDate, formatPercentage } from '../utils/formatters';
 import { Investment } from '../types/investment';
  
-import { investmentFormAtom } from '../utils/atoms';
+import { investmentFormAtom, profitAtom } from '../utils/atoms';
 import { _symbol, _interval } from '../types/binance';
 
 type Candlestick = [string, string, string, string, string, string, string, string, string, string, string];
@@ -26,7 +26,7 @@ const transform = (candlestickData: CandlestickResponse, currentPrice: string, d
       const [openTime, open, high, low, close, volume, closeTime, quoteAssetVolume, numberOfTrades, takerBuyBaseAssetVolume, takerBuyQuoteAssetVolume] = candlestick;
 
       const avgPrice = avg(high, low);
-      const dailyVariation = variation(currentPrice, open); 
+      const dailyVariation = variation(currentPrice, open);  
       const profitDay = profit(dailyVariation, dailyInvestment); 
       compoundProfit += profitDay; 
 
@@ -46,7 +46,7 @@ const transform = (candlestickData: CandlestickResponse, currentPrice: string, d
         avgPrice: formatCurrency(avgPrice),
         dailyVariation: formatPercentage(dailyVariation),
         profitDay: formatCurrency(profitDay),
-        compoundProfit: formatCurrency(compoundProfit)
+        compoundProfit: formatCurrency(compoundProfit),
       }
     }); 
 };
@@ -54,9 +54,21 @@ const transform = (candlestickData: CandlestickResponse, currentPrice: string, d
 export const useCandlestick = (symbol: _symbol = 'BTCEUR', interval: _interval = '1d') => {
   const { data: coinValue } = useCoinValue(symbol); 
   const [investment, ] = useAtom(investmentFormAtom); 
+  const [, setProfit] = useAtom(profitAtom); 
   
   const limit = daysGone(investment.startDate);  
 
-  return useQuery(['candlestick', {symbol, interval, limit}], () => fetcher(symbol, interval, limit), { select: (data: CandlestickResponse) => transform(data, coinValue.price, investment.money) });
+  return useQuery(
+    ['candlestick', 
+    {symbol, interval, limit}], 
+    () => fetcher(symbol, interval, limit), 
+    { 
+      select: (data: CandlestickResponse) => transform(data, coinValue.price, investment.money),
+      onSuccess: (data) => { 
+        if(data.length === 0) return;
+        const compoundProfit = data[data.length-1].compoundProfit.replace(/[^0-9,-]+/g, '').replace(',', '.');   
+        setProfit(Number(compoundProfit) - (Number(investment.money) * data.length))
+      }
+    });
 } 
  

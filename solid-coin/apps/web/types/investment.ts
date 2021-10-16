@@ -14,5 +14,5 @@ export type Investment = {
     avgPrice: string
     dailyVariation: string,
     profitDay: string,
-    compoundProfit: string
+    compoundProfit: string, 
 }

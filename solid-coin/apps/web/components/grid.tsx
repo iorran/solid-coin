@@ -9,16 +9,16 @@ export enum ColumHeader {
   openTime = 'Day', 
   open = 'Value', 
   dailyVariation = 'Daily Variation',
-  profitDay = 'Day Profit',
+  profitDay = 'Day Profit', 
   compoundProfit = 'Compound Profit'
 }  
 
 const columns: GridColDef[] = [
-  { field: 'openTime', headerName: ColumHeader.openTime, width: 120 },
-  { field: 'open', headerName: ColumHeader.open, width: 100 },
-  { field: 'dailyVariation', headerName: ColumHeader.dailyVariation, width: 120 },
-  { field: 'profitDay', headerName: ColumHeader.profitDay, width: 100 },
-  { field: 'compoundProfit', headerName: ColumHeader.compoundProfit, width: 150 },
+  { field: 'openTime', headerName: ColumHeader.openTime, width: 120, align: 'center' },
+  { field: 'open', headerName: ColumHeader.open, width: 100, align: 'center' },
+  { field: 'dailyVariation', headerName: ColumHeader.dailyVariation, width: 120, align: 'center' },
+  { field: 'profitDay', headerName: ColumHeader.profitDay, width: 100, align: 'center' }, 
+  { field: 'compoundProfit', headerName: ColumHeader.compoundProfit, width: 150, align: 'center' },
 ]
  
 export function Grid() {      

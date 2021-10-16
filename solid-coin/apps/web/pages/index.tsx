@@ -3,6 +3,7 @@ import { Container, Box, Typography } from '@mui/material';
 import { InvestmentForm } from '../components/investment-form';
 import { CoinCurrentPrice } from '../components/coin-current-price';
 import { Grid } from '../components/grid';
+import { ProfitPanel } from '../components/profit-panel';
 
 export function Index() {   
   
@@ -12,6 +13,10 @@ export function Index() {
         <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
           <InvestmentForm />  
           <CoinCurrentPrice />
+        </Box> 
+        
+        <Box display="flex" flexDirection="row" alignItems="center">
+          <ProfitPanel />   
         </Box>
 
         <Grid />
